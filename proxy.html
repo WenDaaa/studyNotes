@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input id="user"/>
+    <input type="button" id="btn" value='按钮'/>
+    <div id="showData" ></div>
+
+    <script>
+            let obj = { }
+            const proxy = new Proxy(obj,{
+                get(targrt,name){
+                    return targrt[name]
+                },
+                set(target,name,val){
+                    document.getElementById('showData').innerText=val
+                    target[name]=val
+                },
+            })
+
+            const user = document.getElementById('user')
+            user.addEventListener('input',(e)=>{ //addeventlister可以监听多个方法
+                console.log('监听变化')
+                proxy.user=e.target.value
+            })
+
+            const btn = document.getElementById('btn')
+            btn.onclick=() => { // 多个onclick会覆盖之前的
+                console.log('监听value',proxy.user)
+            }
+        </script>
+</body>
+</html>
