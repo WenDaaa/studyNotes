@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深浅拷贝</title>
+</head>
+<body>
+    <script>
+        //基本数据类型
+        // 赋值 并不属于深浅拷贝
+        let a=5;
+        let b=a;
+        b = 3;
+        console.log(a,b)
+
+        //浅拷贝 公用一个地址
+        let arr = [1,2,3]
+        let newArr = arr;
+        arr.push(4);
+        console.log(arr,newArr);
+
+        // 产生一个新的地址 但是内部是基本类型 所以属于并不影响（深拷贝）
+        let arr2 = [1,2,3]
+        let newArr2 = [...arr2]
+        newArr2.push(4)
+        console.log(arr2,newArr2)
+
+        // 产生一个新的地址 但是内部是相同的地址所以属于（浅拷贝）
+        let arr3 = [[1,2,3],[4,5,6]]
+        let newArr3 = [...arr3]
+        newArr3[0].push(888)
+        console.log(arr3,newArr3)
+
+        // 标准的深拷贝 => 引用类型
+        function deepClone (source){
+            const targetobj = source.constructor === Array ? [] : {};
+            for(let keys in source ){
+                if(source.hasOwnproperty(keys)){
+                    
+                    if(source[keys] && typeof source[keys] === 'object'){
+                          targetobj[keys] = source[keys].constructor === Array ? [] : {};
+                        //递归
+                        targetobj[keys] = deepClone(source[keys])
+                    }else{
+                        targetobj [keys] = source[keys]
+                    }
+                }
+            }
+            return targetobj
+        }
+
+    </script>
+</body>
+</html>
