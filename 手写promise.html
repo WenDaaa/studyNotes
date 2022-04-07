@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>手写一个Promise</h1>
+    <script>
+      // 1. promise的基本结构
+      function MyPromise(excutor) {
+        let self = this;
+        self.status = "pending"; // 初始化的状态
+        self.value = null; // 成功返回的数据
+        self.reason = null; // 失败的原因
+
+        //7.暂存区(解决异步的问题)
+        self.onFulfilledCallBacks = [];
+        self.onRejectedCallBacks = [];
+
+        // 返回成功的结果
+        function resolve(value) {
+          // 5.1
+          if (self.status === "pending") {
+            self.value = value; // 保存成功的结果
+            self.status = "fulfilled";
+            //9.状态发生变化 => 依次取出
+            self.onFulfilledCallBacks.forEach((item) => item(value));
+          }
+        }
+
+        // 返回失败的结果
+        function reject(reson) {
+          // 5.1
+          if (self.status === "pending") {
+            self.value = reson; // 保存失败的原因
+            self.status = "rejected";
+            //9.状态发生变化 => 依次取出
+            self.onRejectedCallBacks.forEach((item) => item(reson));
+          }
+        }
+
+        //4.excutor => 立即执行
+        try {
+          excutor(resolve, reject);
+        } catch (error) {
+          reject(error);
+        }
+      }
+
+      //2. then() 将then方法挂载在原型上 成功失败都会进来
+      MyPromise.prototype.then = function(onFulfilled, onRejected)  {
+        // 6.确保传进来的是一个方法 否则走默认的方法
+        onFulfilled =
+          typeof onFulfilled === "function"
+            ? onFulfilled
+            : function (data) {
+                resolve(data);
+              };
+
+        onRejected =
+          typeof onRejected === "function"
+            ? onRejected
+            : function (error) {
+                throw error;
+              };
+
+        let self = this;
+        console.log(self.status,self.resolve,'self')
+        // 如果需要链式调用需要在这边判断是否返回的是Promise否则直接返回resolve
+        // 通过instanceof
+        if (self.status === "pending") {
+          self.onFulfilledCallBacks.push(onFulfilled); 
+          self.onRejectedCallBacks.push(onRejected);
+        }
+      };
+
+      //3. 调用promise
+      let demo = new MyPromise((resolve, reject) => {
+        console.log(2222);
+        setTimeout(() => {
+          resolve("222");
+        }, 2000);
+      });
+
+      demo.then((res) => {
+        console.log(res);
+      });
+    </script>
+  </body>
+</html>
